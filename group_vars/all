@@ -1,0 +1,210 @@
+---
+#Host IP for all server
+server_host_IP: 10.1.116.149
+
+#Host user for all server
+server_host_user: root
+
+#The line that needs to be added in the /etc/hosts
+hostline_l7: 10.1.116.149	cconnect.cbs.com
+
+#User and group name for cconnect project
+group_name: cconnect
+user_name: cconnect
+
+#User home directory path
+user_home_path: /app/home/rtfgw
+
+#The password for the cconnect user
+#user_password: password
+#python -c 'import crypt; print crypt.crypt("This is my Password", "$1$SomeSalt$")'
+user_password: $1$password$WgcRVL.VJiyEBrSuRE4R.1
+
+#The directory where the binaries file will be located in testserver(as-ei-is-mongo)
+binaries_path: /app/inst
+
+#The directory where the products file will be located in testserver(as-ei-is-mongo)
+products_path: /app/product
+
+###################################
+###################################
+
+#Ports to be open
+port_mongo: 1763
+port_as: 9443
+port_ei: 9444
+port_is: 9445
+
+port_number:
+  - "{{ port_mongo }}"
+  - "{{ port_as }}"
+  - "{{ port_ei }}"
+  - "{{ port_is }}"
+
+####################################
+####################################
+
+#File to be added in /etc/yum.repos.d for installation mongodb
+mongodb_file: mongodb-entreprise.repo
+
+#New log path for mongodb
+log_path: /app/database/mongo/log
+
+#New data path for mongodb
+data_path: /app/database/mongo/data
+
+#Initial data path for mongo
+init_mongo_path: /var/lib/mongo
+
+#Initial log path for mongo
+init_mongo_log_path: /var/log/mongodb
+
+#New path for mongo
+new_mongo_path: /app/database/mongo
+
+#Files mongod_conf initial and edited
+mongod_conf: /etc/mongod.conf
+#mongod_conf_org: /etc/mongod.conf.org
+
+#The Bind_ip for mongod
+mongo_bind_ip: 10.1.116.149
+
+#Script for create Role and User
+queryMongoAddUser_path_src: /home/cconnect/roles/cconnect-database/templates
+queryMongoAddUser_Script: queryMongoAddUser.js
+
+####################################
+####################################
+
+#URL for java jdk-8u161-linux-x64.rpm (fresh link)
+download_url: https://download.oracle.com/otn/java/jdk/8u161-b12/2f38c3b165be4555a1fa6e98c45e0808/jdk-8u161-linux-x64.rpm?AuthParam=1546523544_096dfaf624ea5a436b51b60d14f3841a 
+
+jdk: jdk-8u161-linux-x64.rpm
+
+path_jdk_src: /home/cconnect/roles/cconnect-common/files
+
+jdk_version: jdk1.8.0_161
+#The path when the jdk to be downloaded
+java_archive: "{{binaries_path}}/{{jdk}}"
+
+#The Script for running the servers AS, EI and IS
+path_run_script_src: /home/cconnect/roles/cconnect-common/templates
+run_script: cconnectCtl.sh
+
+#JAVA_HOME path for .bash_profile
+path_JAVA_HOME: "/usr/java/{{jdk_version}}"
+
+#The .bash_profile path
+path_bash_profile: /app/product
+
+####################################
+####################################
+
+#The source path for zip file of the servers
+src_server_zip_file: /home/cconnect/roles/cconnect-install-servers/files
+
+#The zip files of each servers: AS, EI and IS
+as_zip_file: wso2as-5.3.0.zip
+ei_zip_file: wso2ei-6.1.1.zip
+is_zip_file: wso2is-5.5.0.zip
+
+#Files name of each servers: AS, EI and IS
+as_file: AS_HOME_5.3.0
+path_as_file: "{{products_path}}/AS_HOME_5.3.0/wso2as-5.3.0"
+
+ei_file: EI_HOME_6.1.1
+path_ei_file: "{{products_path}}/EI_HOME_6.1.1/wso2ei-6.1.1"
+
+is_file: IS_HOME_5.5.0
+path_is_file: "{{products_path}}/IS_HOME_5.5.0/wso2is-5.5.0"
+
+#Name of each servers: AS, EI and IS
+as_name: AS
+ei_name: EI
+is_name: IS
+
+####################################
+####################################
+
+#The path of carbon.xml file in EI and IS server
+path_carbon_is: "{{ path_server_file }}/repository/conf"
+path_carbon_ei: "{{ path_server_file }}/conf"
+
+#The carbon file in server
+carbon_file: carbon.xml
+
+####################################
+####################################
+
+#The path of axis2.xml file in EI and IS server
+path_axis2_is: "{{ path_server_file }}/repository/conf/axis2"
+path_axis2_ei: "{{ path_server_file }}/conf/axis2"
+
+#The axis2 file in server
+axis2_file: axis2.xml
+
+####################################
+####################################
+
+#The path of catalina-server.xml in EI server
+path_catalina_ei: "{{ path_server_file }}/conf/tomcat"
+path_catalina_is: "{{ path_server_file }}/repository/conf/tomcat"
+
+#The catalina-server file in server
+catalina_file: catalina-server.xml
+
+####################################
+####################################
+
+#EI Configuration Variables
+ei_offset_value: 2
+ei_keystore_jks_file: cbs.jks
+ei_keystore_password: p@ssw0rd
+ei_keystore_keyalias: cbscert
+ei_keystore_keypassword: p@ssw0rd
+
+ei_truststore_jks_file: cbs-truststore.jks
+ei_truststore_password: p@ssw0rd
+
+#IS Configuration Variables
+is_offset_value: 1
+is_keystore_jks_file: cbs.jks
+is_keystore_password: p@ssw0rd
+is_keystore_keyalias: cbscert
+is_keystore_keypassword: p@ssw0rd
+
+is_truststore_jks_file: cbs-truststore.jks
+is_truststore_password: p@ssw0rd
+
+####################################
+####################################
+
+#Path carbon Apps file source in project
+path_carbonapps_src: /home/cconnect/roles/cconnect-carbon-deploy/files
+
+#Path carbon Apps deployment in EI
+path_ei_carbonapps_deploy: "{{ path_server_file }}/repository/deployment/server/carbonapps"
+
+#Carbon Apps file to be deploy
+carbon_app: 
+  - RTFCompositeApplication_1.0.0.car
+
+####################################
+####################################
+
+#Path web Apps file source in project
+path_webapp_src: /home/cconnect/roles/cconnect-webappfiles-deploy/files
+
+#Path webapps deployment in AS
+path_as_webapp_deploy: "{{ path_server_file }}/repository/deployment/server/webapps"
+
+#web Apps files to be deploy
+web_app:
+  - Global_RTF_GetCommonReferenceDictionary.war
+  - Global_RTF_InsertMessageToQueue.war
+  - Global_RTF_SwiftOrchestrator.war
+  - Global_RTF_UpdateMessagesStatus.war
+
+
+username_value: cconnect
+password_value: password
