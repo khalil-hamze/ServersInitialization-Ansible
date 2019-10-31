@@ -1,0 +1,26 @@
+#Host for all server (mongo, AS, IS and EI)
+myserver ansible_ssh_host={{server_host_IP}} ansible_ssh_user="{{server_host_user}}"
+
+[testserver]
+ myserver
+
+
+####Host for mongo database
+#cconnect_mongo ansible_ssh_host={{mongo_host_IP}} anasible_ssh_user="{{mongo_host_user}}"
+#[mongo_host]
+# cconnect_mongo
+
+####Host for AS server
+#cconnect_as ansible_ssh_host={{as_host_IP}} anasible_ssh_user="{{as_host_user}}"
+#[as_host]
+# cconnect_as
+
+####Host for IS server
+#cconnect_is ansible_ssh_host={{is_host_IP}} anasible_ssh_user="{{is_host_user}}"
+#[is_host]
+# cconnect_is
+
+####Host for EI server
+#cconnect_ei ansible_ssh_host={{ei_host_IP}} anasible_ssh_user="{{ei_host_user}}"
+#[ei_host]
+# cconnect_ei
