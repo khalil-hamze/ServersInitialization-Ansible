@@ -1,0 +1,77 @@
+---
+- name: Preparing all the servers
+  hosts: testserver
+  remote_user: root
+  vars:
+    port_number:
+      - "{{ port_mongo }}"
+      - "{{ port_as }}"
+      - "{{ port_ei }}"
+      - "{{ port_is }}"
+
+  roles:
+    - os-common
+
+    - role: firewall-enable-ports
+
+    - cconnect-database
+
+    - cconnect-common
+
+##################################################
+
+    - role: cconnect-install-servers
+      server_zip_file: "{{ as_zip_file }}"
+      server_file: "{{ as_file }}"
+      server_name: "{{ as_name }}"
+
+    - role: cconnect-start-wso2
+      server_name: "{{ as_name }}"
+
+    - role: cconnect-webappfiles-deploy
+      path_server_webapp_deploy: "{{ path_as_webapp_deploy }}"
+      path_server_file: "{{ path_as_file }}"
+
+    - role: cconnect-start-wso2
+      server_name: "{{ as_name }}"
+
+####################################################
+
+    - role: cconnect-install-servers
+      server_zip_file: "{{ is_zip_file }}"
+      server_file: "{{ is_file }}"
+      server_name: "{{ is_name }}"
+
+    - role: cconnect-is-wso2-config
+      path_server_file: "{{ path_is_file }}"
+      server_name: "{{ is_name }}"
+      become: yes
+      become_user: "{{ user_name }}"
+
+    - role: cconnect-start-wso2
+      server_name: "{{ is_name }}"
+
+#####################################################
+
+    - role: cconnect-install-servers
+      server_zip_file: "{{ ei_zip_file }}"
+      server_file: "{{ ei_file }}"
+      server_name: "{{ ei_name }}"
+
+    - role: cconnect-ei-wso2-config
+      path_server_file: "{{ path_ei_file }}"
+      server_name: "{{ ei_name }}"
+      become: yes
+      become_user: "{{ user_name }}"
+
+    - role: cconnect-start-wso2
+      server_name: "{{ ei_name }}"
+
+    - role: cconnect-carbon-deploy
+      path_server_carbonapps_deploy: "{{path_ei_carbonapps_deploy}}"
+      path_server_file: "{{ path_ei_file }}"
+
+    - role: cconnect-start-wso2
+      server_name: "{{ ei_name }}"
+
+############################################################
