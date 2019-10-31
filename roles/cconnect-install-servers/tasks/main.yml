@@ -1,0 +1,24 @@
+---
+- name: Copy {{server_zip_file}} Software to {{binaries_path}}
+  copy:
+    src: "{{src_server_zip_file}}/{{server_zip_file}}"
+    dest: "{{binaries_path}}"
+  become: yes
+  become_user: "{{user_name}}"
+
+- name: Unzip {{server_zip_file}} software (extract file to {{ products_path }})
+  command: unzip -o "{{binaries_path}}/{{server_zip_file}}" -d "{{products_path}}/{{server_file}}" warn=false
+  become: yes
+  become_user: "{{user_name}}"
+
+#- name: Source bash_profile for run script
+#  shell: source {{path_bash_profile}}/.bash_profile
+#  become: yes
+#  become_user: "{{ user_name }}"
+
+#- name: Start {{server_name}} using the script
+#  command: sh ./cconnectCtl.sh "{{server_name}}" restart
+#  args:
+#    chdir: "{{user_home_path}}"
+#  become: yes
+#  become_user: "{{user_name}}"

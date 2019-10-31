@@ -1,0 +1,9 @@
+---
+- name: Copy {{item}} to {{path_server_webapp_deploy}} for deployment
+  copy:
+    src: "{{ path_webapp_src }}/{{ item }}"
+    dest: "{{ path_server_webapp_deploy }}"
+  with_items: 
+    "{{ web_app }}"
+  become: yes
+  become_user: "{{ user_name }}"

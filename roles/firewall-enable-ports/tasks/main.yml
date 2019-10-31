@@ -1,0 +1,11 @@
+---
+- name: Enable port {{ item }} access on firewall
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+  with_items:
+    "{{ port_number }}"
+
+- name: Reload firewall
+  command: firewall-cmd --reload

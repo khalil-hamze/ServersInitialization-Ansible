@@ -1,0 +1,128 @@
+---
+- name: Add {{mongodb_file}} in /etc/yum.repos.d
+  blockinfile:
+    path: "/etc/yum.repos.d/{{mongodb_file}}"
+    create: yes
+    block: |
+      [mongodb-enterprise]
+      name=MongoDB Enterprise Repository
+      baseurl=https://repo.mongodb.com/yum/redhat/$releasever/mongodb-enterprise/3.6/$basearch/
+      gpgcheck=1
+      enabled=1
+      gpgkey=https://www.mongodb.org/static/pgp/server-3.6.asc
+
+- name: Install Mongodb
+  yum:
+    name:
+      - mongodb-enterprise-3.6.7
+      - mongodb-enterprise-server-3.6.7
+      - mongodb-enterprise-shell-3.6.7
+      - mongodb-enterprise-mongos-3.6.7
+      - mongodb-enterprise-tools-3.6.7
+    state: present
+
+- name: Start Mongodb
+  systemd:
+    name: mongod
+    state: started
+
+- name: Turn off mongod
+  systemd:
+    name: mongod
+    state: stopped
+
+- name: Create log file directory for mongo
+  file:
+    path: "{{ log_path }}"
+    state: directory
+    mode: 757
+
+- name: Create data file directory for mongo
+  file:
+    path: "{{ data_path }}"
+    state: directory
+    mode: 757
+
+- name: Copy all content {{init_mongo_path}} to {{data_path}}
+  command: cp -a "{{ init_mongo_path }}/." "{{ data_path }}"
+
+- name: Change owner to mongod
+  command: chown -R mongod:mongod "{{ new_mongo_path }}" warn=false
+
+- name: Install the package policycoreutils-python-2.2.5-11.el7_0.1.x86_64 in order to use semanage
+  yum:
+    name: policycoreutils-python
+    state: present
+
+- name: Configuration for change defaut port 27017 to 1763
+  command: semanage port -a -t mongod_port_t -p tcp "{{port_mongo}}"
+  ignore_errors: yes
+
+- name: Copy mongod.conf for backup
+  copy:
+    src: "{{ mongod_conf }}"
+    dest: "{{ mongod_conf }}.org"
+    remote_src: yes
+
+#- name: Change log path in {{mongod_conf}}
+#  lineinfile:
+#    path: "{{mongod_conf}}"
+#    regexp: '^  path:'
+#    line: '  path: {{log_path}}/mongod.log'
+
+#- name: Change data Path in {{mongod_conf}}
+#  lineinfile:
+#    path: "{{mongod_conf}}"
+#    regexp: '^  dbPath:'
+#    line: '  dbPath: {{data_path}}'
+
+- name: Change port in {{mongod_conf}}
+  lineinfile:
+    path: "{{mongod_conf}}"
+    regexp: '^  port:'
+    line: '  port: {{port_mongo}}'
+
+- name: Add bindIp in {{mongod_conf}}
+  lineinfile:
+    path: "{{mongod_conf}}"
+    regexp: '^  bindIp: 127.0.0.1'
+    line: '  bindIp: 127.0.0.1,{{mongo_bind_ip}}'
+
+- name: Start mongod.service
+  systemd:
+    name: mongod
+    state: started
+
+#- name: Remove {{init_mongo_path}} directory
+#  file:
+#    state: absent
+#    path: "{{ init_mongo_path }}"
+
+#- name: Remove mongo log directory
+#  file:
+#    state: absent
+#    path: "{{init_mongo_log_path}}"
+
+- name: Copy {{queryMongoAddUser_Script}} to {{binaries_path}} for creating mongodb user
+  copy:
+    src: "{{ queryMongoAddUser_path_src }}/{{ queryMongoAddUser_Script }}.j2"
+    dest: "{{ binaries_path }}/{{ queryMongoAddUser_Script }}"
+
+- name: Execute {{queryMongoAddUser_Script}} for creating mongodb user
+  command: mongo "{{mongo_bind_ip}}:{{port_mongo}}"/admin "{{binaries_path}}/{{queryMongoAddUser_Script}}"
+  ignore_errors: yes
+
+- name: Edit mongod.conf for auth cbsadmin
+  blockinfile:
+    path: "{{mongod_conf}}"
+    insertafter: '#security:'
+    block: |
+      security:
+       authorization: enabled
+      setParameter:
+        enableLocalhostAuthBypass: false
+
+- name: Restart mongod
+  systemd:
+    name: mongod
+    state: restarted

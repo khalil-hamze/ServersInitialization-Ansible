@@ -1,0 +1,17 @@
+db.createRole(
+	{
+	 role: "SuperUser",
+	 privileges: [
+		{ resource: { anyResource: true }, actions: [ "anyAction"]}
+		],
+			roles: []
+	}
+)
+
+db.createUser({ user: "cbsadmin",
+		pwd: "password",
+		roles: [ "SuperUser", "root" ]
+		}
+	)
+	
+db.getUsers()

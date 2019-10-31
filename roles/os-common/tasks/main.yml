@@ -1,0 +1,52 @@
+---
+#- name: Update OS
+#  yum:
+#    name: '*'
+#    state: latest
+
+- name: Install Packages wget, net-tools, unzip & curl
+  yum:
+    name:
+      - wget
+      - net-tools
+      - unzip
+      - curl
+    state: present
+
+- name: Set hostname and IP in hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostline_l7 }}"
+
+- name: Create {{group_name}} group
+  group:
+    name: "{{ group_name }}"
+    state: present
+
+- name: create directory {{ user_home_path }} for user home
+  file:
+    path: "{{ user_home_path }}"
+    state: directory
+    mode: u=rwX,g=rwX,o=rwX
+
+- name: Create {{user_name}} user
+  user:
+    name: "{{ user_name }}"
+    password: "{{ user_password | password_hash('sha512') }}"
+#    createhome: yes
+    home: "{{ user_home_path }}"
+    groups: "{{ group_name }}"
+    state: present
+    append: yes
+
+- name: create directory {{ binaries_path }} for localizing binaries
+  file:
+    path: "{{ binaries_path }}"
+    state: directory
+    mode: u=rwX,g=rwX,o=rwX
+
+- name: create directory {{ products_path }} for localizing products
+  file:
+    path: "{{ products_path }}"
+    state: directory
+    mode: u=rwX,g=rwX,o=rwX

@@ -1,0 +1,9 @@
+---
+- name: Copy {{item}} to {{path_server_carbonapps_deploy}}
+  copy:
+    src: "{{path_carbonapps_src}}/{{item}}"
+    dest: "{{path_server_carbonapps_deploy}}"
+  with_items:
+    "{{ carbon_app }}"
+  become: yes
+  become_user: "{{ user_name }}"

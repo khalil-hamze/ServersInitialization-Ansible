@@ -1,0 +1,40 @@
+---
+#- name: Get jdk
+#  command: "wget -q -O {{java_archive}} --no-check-certificate --no-cookies --header 'Cookie: oraclelicense=accept-securebackup-cookie' {{download_url}} creates={{java_archive}} warn=False"
+#  ignore_errors: yes
+
+- name: Copy {{jdk}} to {{binaries_path}} (skip download jdk)
+  copy:
+    src: "{{path_jdk_src}}/{{jdk}}"
+    dest: "{{binaries_path}}"
+
+- name: Install jdk
+  command: rpm -ivh {{jdk}}  warn=False
+  args:
+    chdir: "{{binaries_path}}"
+  ignore_errors: yes
+
+- name: Copy {{run_script}} to the {{user_home_path}} directory
+  template:
+    src: "{{ path_run_script_src }}/{{ run_script }}.j2"
+    dest: "{{ user_home_path }}/{{ run_script }}"
+  become: yes
+  become_user: "{{user_name}}"
+
+- name: Change permission to execute
+  command: chmod 744 cconnectCtl.sh warn=false
+  args:
+    chdir: "{{ user_home_path }}"
+
+- name: Update bash_profile script to include JAVA_HOME path
+#  command: echo "JAVA_HOME={{path_JAVA_HOME}}; export JAVA_HOME" >> {{path_bash_profile}}/.bash_profile
+  shell: |
+    echo 'export JAVA_HOME=/usr/java/{{jdk_version}};
+    export JAVA_HOME'>> {{path_bash_profile}}/.bash_profile
+  become: yes
+  become_user: "{{user_name}}"
+
+- name: Change permission to execute
+  command: chmod 744 .bash_profile warn=false
+  args:
+    chdir: "{{ path_bash_profile }}"

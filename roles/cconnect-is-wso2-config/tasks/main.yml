@@ -1,0 +1,142 @@
+---
+- name: Copy {{carbon_file}} in {{server_name}} for backup
+  copy:
+    src: "{{ path_carbon_is }}/{{ carbon_file }}"
+    dest: "{{ path_carbon_is }}/{{ carbon_file }}.org"
+    remote_src: yes
+  become: yes
+  become_user: "{{ user_name }}"
+
+- name: Change Offset in {{carbon_file}} of {{server_name}} server
+  lineinfile:
+    path: "{{ path_carbon_is }}/{{ carbon_file }}"
+    regexp: '^        <Offset>0</Offset>'
+    line: '        <Offset>{{is_offset_value}}</Offset>'
+  become: yes
+  become_user: "{{ user_name }}"
+
+- name: Change location under KeyStore in {{carbon_file}}
+  lineinfile:
+    path: "{{ path_carbon_is }}/{{ carbon_file }}"
+    regexp: '^            <Location>\${carbon.home}/repository/resources/security/wso2carbon.jks</Location>'
+    line: '            <Location>${carbon.home}/repository/resources/security/{{is_keystore_jks_file}}</Location>'
+
+- name: Change password under KeyStore in {{carbon_file}}
+  lineinfile:
+    path: "{{ path_carbon_is }}/{{ carbon_file }}"
+    regexp: '^            <Password>wso2carbon</Password>'
+    line: '            <Password>{{is_keystore_password}}</Password>'
+
+- name: Change keyAlias under KeyStore in {{carbon_file}}
+  lineinfile:
+    path: "{{ path_carbon_is }}/{{ carbon_file }}"
+    regexp: '^            <KeyAlias>wso2carbon</KeyAlias>'
+    line: '            <KeyAlias>{{is_keystore_keyalias}}</KeyAlias>'
+
+- name: Change Key password under KeyStore in {{carbon_file}}
+  lineinfile:
+    path: "{{ path_carbon_is }}/{{ carbon_file }}"
+    regexp: '^            <KeyPassword>wso2carbon</KeyPassword>'
+    line: '            <KeyPassword>{{is_keystore_keypassword}}</KeyPassword>'
+
+
+- name: Change location under TrustStore in {{carbon_file}}
+  lineinfile:
+    path: "{{ path_carbon_is }}/{{ carbon_file }}"
+    regexp: '^            <Location>\${carbon.home}/repository/resources/security/client-truststore.jks</Location>'
+    line: '            <Location>${carbon.home}/repository/resources/security/{{is_truststore_jks_file}}</Location>'
+
+- name: Change password under TrustStore in {{carbon_file}}
+  lineinfile:
+    path: "{{ path_carbon_is }}/{{ carbon_file }}"
+    regexp: '^            <Password>wso2carbon</Password>'
+    line: '            <Password>{{is_truststore_password}}</Password>'
+
+- name: Copy {{axis2_file}} in {{server_name}} for backup
+  copy:
+    src: "{{ path_axis2_is }}/{{ axis2_file }}"
+    dest: "{{ path_axis2_is }}/{{ axis2_file }}.org"
+    remote_src: yes
+  become: yes
+  become_user: "{{ user_name }}"
+
+- name: Change location KeyStore under transportReceiver in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <Location>repository/resources/security/wso2carbon.jks</Location>'
+    line: '                <Location>repository/resources/security/{{is_keystore_jks_file}}</Location>'
+
+- name: Change password KeyStore under transportReceiver in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <Password>wso2carbon</Password>'
+    line: '                <Password>{{is_keystore_password}}</Password>'
+
+- name: Change Key password KeyStore under transportReceiver in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <KeyPassword>wso2carbon</KeyPassword>'
+    line: '                <KeyPassword>{{is_keystore_keypassword}}</KeyPassword>'
+
+- name: Change location TrustStore under transportReceiver in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <Location>repository/resources/security/client-truststore.jks</Location>'
+    line: '                <Location>repository/resources/security/{{is_truststore_jks_file}}</Location>'
+
+- name: Change password TrustStore under transportReceiver in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <Password>wso2carbon</Password>'
+    line: '                <Password>{{is_truststore_password}}</Password>'
+
+#############################################################
+
+- name: Change location KeyStore under transportSender in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <Location>repository/resources/security/wso2carbon.jks</Location>'
+    line: '                <Location>repository/resources/security/{{is_keystore_jks_file}}</Location>'
+
+- name: Change password KeyStore under transportSender in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <Password>wso2carbon</Password>'
+    line: '                <Password>{{is_keystore_password}}</Password>'
+
+- name: Change Key password KeyStore under transportSender in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <KeyPassword>wso2carbon</KeyPassword>'
+    line: '                <KeyPassword>{{is_keystore_keypassword}}</KeyPassword>'
+
+- name: Change location TrustStore under transportSender in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <Location>repository/resources/security/client-truststore.jks</Location>'
+    line: '                <Location>repository/resources/security/{{is_truststore_jks_file}}</Location>'
+
+- name: Change password TrustStore under transportSender in {{axis2_file}}
+  lineinfile:
+    path: "{{ path_axis2_is }}/{{ axis2_file }}"
+    regexp: '^                <Password>wso2carbon</Password>'
+    line: '                <Password>{{is_truststore_password}}</Password>'
+
+#############################################################
+#############################################################
+
+- name: Change KeystoreFile variable in {{catalina_file}}
+  replace:
+    path: "{{ path_catalina_is }}/{{ catalina_file }}"
+    regexp: 'wso2carbon.jks'
+    replace: "{{is_keystore_jks_file}}"
+
+- name: Change KeystoreFile variable in {{catalina_file}}
+  replace:
+    path: "{{ path_catalina_is }}/{{ catalina_file }}"
+    regexp: 'wso2carbon'
+    replace: "{{is_keystore_password}}"
+  become: yes
+  become_user: "{{ user_name }}"
+
+
